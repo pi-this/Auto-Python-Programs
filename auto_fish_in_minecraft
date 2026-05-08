@@ -1,3 +1,7 @@
+# set the subtitles to the bottom right of the screen for this to work.
+
+
+
 import pyautogui
 import pytesseract
 import time
