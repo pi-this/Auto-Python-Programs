@@ -1,0 +1,52 @@
+import pyautogui
+import pytesseract
+import time
+from difflib import SequenceMatcher
+from PIL import Image
+
+# Path to Tesseract
+pytesseract.pytesseract.tesseract_cmd = r"C:\Program Files\Tesseract-OCR\tesseract.exe"
+
+# Your exact subtitle region (left, top, width, height)
+SUBTITLE_REGION = (1341, 789, 561, 32)
+
+def cast_or_reel():
+    pyautogui.press("e")  # Your fishing key
+
+def read_subtitle():
+    screenshot = pyautogui.screenshot(region=SUBTITLE_REGION)
+    text = pytesseract.image_to_string(
+        screenshot,
+        config="--psm 7 -c tessedit_char_whitelist=abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
+    )
+    return text.strip().lower()
+
+def looks_like_splash(text):
+    # Fuzzy match OCR output to "splashing"
+    similarity = SequenceMatcher(None, text, "splashing").ratio()
+    return similarity > 0.55
+
+def fish_loop():
+    print("Starting fishing bot in 3 seconds…")
+    time.sleep(3)
+
+    while True:
+        cast_or_reel()
+        print("Rod cast. Waiting for splash…")
+
+        while True:
+            text = read_subtitle()
+            print("OCR:", text)
+
+            if looks_like_splash(text):
+                print("Splash detected!")
+                break
+
+            time.sleep(0.1)
+
+        cast_or_reel()
+        print("Reeled in!")
+
+        time.sleep(1.5)
+
+fish_loop()
